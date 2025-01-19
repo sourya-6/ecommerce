@@ -1,6 +1,7 @@
 const orderSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    items: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
     totalPrice: { type: Number, required: true },
     snapXMembership: { type: mongoose.Schema.Types.ObjectId, ref: "SnapXMembership", default: null }, // Reference to SnapXMembership model
     snapXDiscountAmount: { type: Number, default: 0 }, // Store SnapX discount value

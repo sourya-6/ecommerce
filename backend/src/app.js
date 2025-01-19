@@ -4,8 +4,9 @@ import cookieParser from "cookie-parser"
 const app=express()
 //initializing cors
 app.use(cors({
-    origin:process.env.CORS_ORIGIN,
-    credentials:true
+    origin:process.env.CORS_ORIGIN,//can meantion any domain if need we can give like ["https://snapbuy.com", "http://localhost:3000"],
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",//by default allows only get method and post
+    credentials:true//allows cookies
 }))
 
 app.use(express.json({limit:"16kb"}))//shows the how much space is needed

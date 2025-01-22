@@ -3,26 +3,12 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
-import { sendEmail } from "../utils/nodemailer.js";
+//import { sendEmail } from "../utils/nodemailer.js";
 
 // Generate Access Token
-const generateAccessToken = (user) => {
-  return jwt.sign(
-    { _id: user._id, email: user.email, role: user.role, isSnapXMember: user.isSnapXMember },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
-  );
-};
-
-// Generate Refresh Token
-const generateRefreshToken = (user) => {
-  return jwt.sign({ _id: user._id }, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-  });
-};
 
 // 📌 **User Registration**
-export const registerUser = asyncHandler(async (req, res) => {
+const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password, phoneNumber } = req.body;
 
   const existingUser = await User.findOne({ email });
@@ -52,7 +38,7 @@ export const registerUser = asyncHandler(async (req, res) => {
 });
 
 // 📌 **User Login**
-export const loginUser = asyncHandler(async (req, res) => {
+const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
@@ -83,7 +69,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 });
 
 // 📌 **User Logout**
-export const logoutUser = asyncHandler(async (req, res) => {
+const logoutUser = asyncHandler(async (req, res) => {
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
 
@@ -91,9 +77,24 @@ export const logoutUser = asyncHandler(async (req, res) => {
 
   res.status(200).json({ success: true, message: "Logged out successfully" });
 });
+//generate access and refresh token
+const generateAccessAndRefreshTokens=async(userId)=>{
+  try {
+    const user=await User.findById(userId)
+    const accessToken=user.generateAccessToken()//generates an access token from the reference of user.model
+    const refreshToken=user.generateRefreshToken()//generates an refresh token from the reference of user.model
+    user.refreshToken=refreshToken
+    await user.save({ validateBeforeSave:false })
+
+    return{accessToken,refreshToken}
+
+} catch (error) {
+    throw new ApiError(500,"Something went wrong while generating the access and refresh tokens")
+}
+}
 
 // 📌 **Forgot Password**
-export const forgotPassword = asyncHandler(async (req, res) => {
+const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
   if (!user) throw new ApiError(404, "User not found");
@@ -106,7 +107,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 });
 
 // 📌 **Reset Password**
-export const resetPassword = asyncHandler(async (req, res) => {
+const resetPassword = asyncHandler(async (req, res) => {
   const { resetToken, newPassword } = req.body;
 
   try {
@@ -124,7 +125,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
 });
 
 // 📌 **Verify Email (OTP)**
-export const verifyEmail = asyncHandler(async (req, res) => {
+const verifyEmail = asyncHandler(async (req, res) => {
   const { email, otp } = req.body;
   const user = await User.findOne({ email, otp });
 
@@ -137,7 +138,7 @@ export const verifyEmail = asyncHandler(async (req, res) => {
 });
 
 // 📌 **Social Login (Google, Facebook)**
-export const socialLogin = asyncHandler(async (req, res) => {
+const socialLogin = asyncHandler(async (req, res) => {
   const { provider, email, name, profileImage } = req.body;
 
   let user = await User.findOne({ email });
@@ -150,7 +151,7 @@ export const socialLogin = asyncHandler(async (req, res) => {
 });
 
 // 📌 **Role-Based Access Control Middleware**
-export const authorizeRoles = (...roles) => {
+const authorizeRoles = (...roles) => {
   return asyncHandler((req, res, next) => {
     if (!roles.includes(req.user.role)) {
       throw new ApiError(403, "Access denied");
@@ -158,3 +159,16 @@ export const authorizeRoles = (...roles) => {
     next();
   });
 };
+
+
+
+export {
+    registerUser,
+    loginUser,
+    logoutUser,
+    forgotPassword,
+    resetPassword,
+    verifyEmail,
+    socialLogin,
+    authorizeRoles
+}

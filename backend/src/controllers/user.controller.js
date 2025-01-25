@@ -17,7 +17,7 @@ const registerUser = asyncHandler(async (req, res) => {
   if (existingUser) throw new ApiError(409, "User already exists");
 
   //const hashedPassword = await bcrypt.hash(password, 10);
-
+  //here we double hashed it which produced error
   const user = await User.create({
     name,
     email,
@@ -42,15 +42,15 @@ const registerUser = asyncHandler(async (req, res) => {
 // 📌 **User Login**
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  console.log(req.body)
+  
 
   const user = await User.findOne({ email });
   if (!user) throw new ApiError(401, "User not exist");
-  console.log(user)
+  
   
 
   const isPasswordValid = await user.isPasswordCorrect(password);
-  console.log(isPasswordValid)
+  
   if (!isPasswordValid) throw new ApiError(401, "Invalid credentials");
 
   const accessToken = generateAccessToken(user);

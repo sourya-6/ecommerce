@@ -30,11 +30,9 @@ userSchema.pre("save", async function (next) {
 })
 
 userSchema.methods.isPasswordCorrect = async function(password){
-  console.log(this.password,password)
-  console.log(await bcrypt.compare(password, this.password))
   return await bcrypt.compare(password, this.password)
 }
-console.log(await bcrypt.compare("$2b$10$2WFsA3g2w5iCPCZbeMQAAuqTN5CHlLlaDeTqB6QdZuKl6angDlDWO","123"))
+
 
 // Method to generate access token with more user info
 userSchema.methods.generateAccessToken = function () {

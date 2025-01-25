@@ -14,7 +14,8 @@ app.use(express.urlencoded({extended:true,limit:"16kb"}))//used to deal with the
 app.use(express.static("public"))
 app.use(cookieParser())//recent activities
 
-import {userRouter} from "./routes/user.routes.js"
+import userRouter from "./routes/user.routes.js"
+app.use("/api/v1/user",userRouter)
 
 
 

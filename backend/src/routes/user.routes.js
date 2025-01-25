@@ -1,4 +1,4 @@
-import express from "express";
+import {Router} from "express";
 import {
   registerUser,
   loginUser,
@@ -10,17 +10,21 @@ import {
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
-const router = express.Router();
+const router = Router();
 
 // 📌 **User Authentication Routes**
-router.use(verifyJWT);
+
+
 router.post("/register", registerUser); // User Registration
 router.post("/login", loginUser); // User Login
+router.post("/forgot-password", forgotPassword); // Forgot Password
+router.post("/reset-password", resetPassword); // Reset Password
+
+
 router.post("/logout",  logoutUser); // User Logout
 
 // 📌 **Password Management Routes**
-router.post("/forgot-password", forgotPassword); // Forgot Password
-router.post("/reset-password", resetPassword); // Reset Password
+
 
 // 📌 **Email Verification**
 router.post("/verify-email", verifyEmail); // Verify Email OTP

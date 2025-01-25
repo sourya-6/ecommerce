@@ -1,32 +1,34 @@
 import { User } from "../models/user.model.js";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
-//import { sendEmail } from "../utils/nodemailer.js";
+import { ApiResponse } from "../utils/apiResponse.js";
+import { sendWelcomeEmail } from "../utils/nodemailer.js";
 
 // Generate Access Token
 
 // 📌 **User Registration**
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password, phoneNumber } = req.body;
+  console.log(req.body)
 
   const existingUser = await User.findOne({ email });
   if (existingUser) throw new ApiError(409, "User already exists");
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  //const hashedPassword = await bcrypt.hash(password, 10);
 
   const user = await User.create({
     name,
     email,
-    password: hashedPassword,
+    password,
     phoneNumber,
   });
 
   // Send Welcome Email
-  sendEmail(email, "Welcome to SnapBuy", "Your account has been successfully created!");
+  sendWelcomeEmail(email, name);
 
-  res.status(201).json({
+  res.status(201).json(new ApiResponse(201 ,{
     success: true,
     message: "User registered successfully",
     data: {
@@ -34,17 +36,21 @@ const registerUser = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
     },
-  });
+  }));
 });
 
 // 📌 **User Login**
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
+  console.log(req.body)
 
   const user = await User.findOne({ email });
-  if (!user) throw new ApiError(401, "Invalid credentials");
+  if (!user) throw new ApiError(401, "User not exist");
+  console.log(user)
+  
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
+  const isPasswordValid = await user.isPasswordCorrect(password);
+  console.log(isPasswordValid)
   if (!isPasswordValid) throw new ApiError(401, "Invalid credentials");
 
   const accessToken = generateAccessToken(user);

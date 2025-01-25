@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 const userSchema = new mongoose.Schema(
@@ -20,17 +20,21 @@ const userSchema = new mongoose.Schema(
 );
 
 // Password hashing hook
-userSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 10);
-  }
-  next();
-});
 
-// Method to compare password
-userSchema.methods.isPasswordCorrect = async function (password) {
-  return await bcrypt.compare(password, this.password);
-};
+
+userSchema.pre("save", async function (next) {
+  if(!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 10)
+  next();
+})
+
+userSchema.methods.isPasswordCorrect = async function(password){
+  console.log(this.password,password)
+  console.log(await bcrypt.compare(password, this.password))
+  return await bcrypt.compare(password, this.password)
+}
+console.log(await bcrypt.compare("$2b$10$2WFsA3g2w5iCPCZbeMQAAuqTN5CHlLlaDeTqB6QdZuKl6angDlDWO","123"))
 
 // Method to generate access token with more user info
 userSchema.methods.generateAccessToken = function () {

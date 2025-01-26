@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
     accessToken: { type: String },
     refreshToken: { type: String },
     resetOTP:{type: String,default:undefined},
-    resetOTPExpires:{type: Date,defaultq:undefined},
+    resetOTPExpires:{type: Date,default:undefined},
   },
   { timestamps: true }
 );

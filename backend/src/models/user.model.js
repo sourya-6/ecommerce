@@ -1,20 +1,24 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    username:{type: String, required: true, unique: true},
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, default: 'customer', enum: ['admin', 'customer', 'seller'] },
     isSnapXMember: { type: Boolean, default: false },
     snapXExpiry: { type: Date },
-    profileImage: { type: String },
+    avatar: { type: String ,required: true},
     phoneNumber: { type: String },
     isVerified: { type: Boolean, default: false },
     accessToken: { type: String },
     refreshToken: { type: String },
+    resetOTP:{type: String,default:undefined},
+    resetOTPExpires:{type: Date,defaultq:undefined},
   },
   { timestamps: true }
 );
@@ -40,8 +44,10 @@ userSchema.methods.generateAccessToken = function () {
     {
       _id: this._id,
       email: this.email,
+      username: this.username,
       name: this.name,
       role: this.role,
+      avatar: this.avatar,
       isSnapXMember: this.isSnapXMember,
       snapXExpiry: this.snapXExpiry,
       profileImage: this.profileImage,
@@ -62,5 +68,13 @@ userSchema.methods.generateRefreshToken = function () {
   );
 };
 
+
+userSchema.methods.generateOTP=function(){
+  const otp = Math.floor(100000 + Math.random() * 900000); 
+  console.log(otp)
+  this.resetOTP=otp;
+  this.resetOTPExpires=Date.now()+5*60*1000;//after 5 minutes
+  return otp;
+}
 const User = mongoose.model('User', userSchema);
 export { User } ;

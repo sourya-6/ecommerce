@@ -7,29 +7,41 @@ import {
   resetPassword,
   verifyEmail,
   socialLogin,
+  sendOTP
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import{upload} from "../middlewares/multer.middleware.js"
 
 const router = Router();
 
 // 📌 **User Authentication Routes**
 
+router.route("/register").post(
+  upload.fields([
+      {
+          name:"avatar",
+          maxCount:1
+      },
+      
+  ]),
+  registerUser)
 
-router.post("/register", registerUser); // User Registration
-router.post("/login", loginUser); // User Login
-router.post("/forgot-password", forgotPassword); // Forgot Password
-router.post("/reset-password", resetPassword); // Reset Password
+router.route("/login").post(loginUser)
+router.route("/logout").post(verifyJWT,logoutUser)
+router.route("/forgot-password").post(forgotPassword)
+router.route("/reset-password").post(verifyJWT,resetPassword)
+router.route("/send-otp").post(sendOTP)
 
-
-router.post("/logout",  logoutUser); // User Logout
 
 // 📌 **Password Management Routes**
 
 
 // 📌 **Email Verification**
-router.post("/verify-email", verifyEmail); // Verify Email OTP
+router.route("/verify-email").post(verifyEmail);
+
 
 // 📌 **Social Login**
-router.post("/social-login", socialLogin); // Google & Facebook Login
+router.route("/social-login").post(socialLogin);
+
 
 export default router;

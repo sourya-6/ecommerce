@@ -7,7 +7,7 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { sendWelcomeEmail } from "../utils/nodemailer.js";
 import { validateEmail } from "../utils/validateEmail.js";
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
-import { ResetOTPgenerated } from "../utils/OTP.js";
+import { ResetOTPgenerated } from "../utils/reset_otp.js";
 // Generate Access Token
 
 // 📌 **User Registration**
@@ -188,24 +188,26 @@ const resetPassword = asyncHandler(async (req, res) => {
     console.log(user)
     console.log('test two')
     console.log(user.resetOTP,user.resetOTPExpires)
+    console.log(user.resetOTPExpires<Date.now())
+    console.log(Date.now())
     if(user.resetOTP!==resetOTP||user.resetOTPExpires<Date.now()){
       throw new ApiError(400,"Invalid OTP")
     }
     console.log('test three')
-    console.log('hello')
-    user.password=newPassword;
-    console.log('hey')
+   
+    user.password = newPassword
+    
     user.resetOTP=undefined;
     user.resetOTPExpires=undefined;
+    console.log('test four')
     await user.save({validateBeforeSave:false})
+    console.log(user.password)
     const updatedUser=await User.findById(user._id).select("-password -refreshToken")
-    if(!updatedUser){
-      throw new ApiError(500,"Some thing went wrong while resetting the password")
-    }
-  
+    console.log(updatedUser)
+    
     return res.status(200)
     .json(
-      new ApiResponse(200,user,"Password reset successfully").select("-password -refreshToken")
+      new ApiResponse(200,updatedUser,"Password reset successfully")
     )
   } catch (error) {
       throw new ApiError(500,"Something went wrong while resetting the password")

@@ -7,7 +7,8 @@ import {
   resetPassword,
   verifyEmail,
   socialLogin,
-  sendOTP
+  sendOTP,
+  getUserProfile
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import{upload} from "../middlewares/multer.middleware.js"
@@ -28,6 +29,7 @@ router.route("/register").post(
 
 router.route("/login").post(loginUser)
 router.route("/logout").post(verifyJWT,logoutUser)
+router.route("/get-user-details").get(verifyJWT,getUserProfile)
 router.route("/forgot-password").post(forgotPassword)
 router.route("/reset-password").post(verifyJWT,resetPassword)
 router.route("/send-otp").post(sendOTP)

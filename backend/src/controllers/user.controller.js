@@ -99,16 +99,29 @@ const loginUser = asyncHandler(async (req, res) => {
 })
 // 📌 **User Logout**
 const logoutUser = asyncHandler(async (req, res) => {
-  console.log("hey")
   // console.log(user._id)
   await User.findByIdAndUpdate(
     req.user._id, 
     { 
       $unset:{
-        refreshToken:null
-      } });
+        refreshToken:1
+      },
+    },
+    {
+      new:true
+    }
+  );
+  const options={
+    httpOnly:true,
+    secure:true
+  }
+  
+  res.status(200)
+  .clearCookie("accessToken",options)
+  .clearCookie("refreshToken",options)
+  .json(new ApiResponse(200,{}, "User logged out successfully"));
+  
 
-  res.status(200).json({ success: true, message: "Logged out successfully" });
 });
 //generate access and refresh token
 const generateAccessAndRefreshTokens=async(userId)=>{
@@ -215,6 +228,16 @@ const resetPassword = asyncHandler(async (req, res) => {
   
 });
 
+//get user details
+const getUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id).select("-password");
+  if (!user) {
+      throw new ApiError(404,"User not found");
+  }
+  res.status(200).json(new ApiResponse(user, "User profile fetched successfully"));
+});
+
+
 // 📌 **Verify Email (OTP)**
 const verifyEmail = asyncHandler(async (req, res) => {
   const { email, otp } = req.body;
@@ -262,5 +285,6 @@ export {
     verifyEmail,
     socialLogin,
     authorizeRoles,
-    sendOTP
+    sendOTP,
+    getUserProfile
 }

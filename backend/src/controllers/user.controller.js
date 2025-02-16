@@ -237,6 +237,29 @@ const getUserProfile = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(user, "User profile fetched successfully"));
 });
 
+const changeUserDetails=asyncHandler(async(req,res)=>{
+  const {newName,newEmail,newPhoneNumber}=req.body;
+  console.log(newName,newPhoneNumber)
+  console.log(req.user?._id)
+  if(!newName.trim()&&!newEmail.trim()&&!newPhoneNumber.trim()){
+    throw new ApiError(400,"Any One of the field is mandatory");
+  }
+  const user=await User.findByIdAndUpdate(req.user?._id,{
+    $set:{
+      name:newName,
+      phoneNumber:newPhoneNumber
+    }
+  },
+  {new:true}
+).select("-password")
+  console.log(user)
+  if(!user){
+    throw new ApiError("SomeThing went wrong while updating")
+  }
+  res.status(200)
+  .json(new ApiResponse(200,user,"User details updated successfully"))
+})
+
 
 // 📌 **Verify Email (OTP)**
 const verifyEmail = asyncHandler(async (req, res) => {
@@ -286,5 +309,6 @@ export {
     socialLogin,
     authorizeRoles,
     sendOTP,
-    getUserProfile
+    getUserProfile,
+    changeUserDetails
 }

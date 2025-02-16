@@ -8,7 +8,8 @@ import {
   verifyEmail,
   socialLogin,
   sendOTP,
-  getUserProfile
+  getUserProfile,
+  changeUserDetails
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import{upload} from "../middlewares/multer.middleware.js"
@@ -33,6 +34,7 @@ router.route("/get-user-details").get(verifyJWT,getUserProfile)
 router.route("/forgot-password").post(forgotPassword)
 router.route("/reset-password").post(verifyJWT,resetPassword)
 router.route("/send-otp").post(sendOTP)
+router.route("/user-update").patch(verifyJWT,changeUserDetails)
 
 
 // 📌 **Password Management Routes**

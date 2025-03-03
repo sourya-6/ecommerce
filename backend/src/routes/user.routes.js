@@ -1,51 +1,58 @@
-import {Router} from "express";
+import { Router } from "express";
+import passport from "passport";
 import {
   registerUser,
   loginUser,
   logoutUser,
   forgotPassword,
   resetPassword,
-  verifyEmail,
   socialLogin,
+  verifyEmail,
   sendOTP,
   getUserProfile,
-  changeUserDetails
+  changeUserDetails,
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import{upload} from "../middlewares/multer.middleware.js"
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
 // 📌 **User Authentication Routes**
-
-router.route("/register").post(
+router.post(
+  "/register",
   upload.fields([
-      {
-          name:"avatar",
-          maxCount:1
-      },
-      
+    {
+      name: "avatar",
+      maxCount: 1,
+    },
   ]),
-  registerUser)
+  registerUser
+);
 
-router.route("/login").post(loginUser)
-router.route("/logout").post(verifyJWT,logoutUser)
-router.route("/get-user-details").get(verifyJWT,getUserProfile)
-router.route("/forgot-password").post(forgotPassword)
-router.route("/reset-password").post(verifyJWT,resetPassword)
-router.route("/send-otp").post(sendOTP)
-router.route("/user-update").patch(verifyJWT,changeUserDetails)
-
-
-// 📌 **Password Management Routes**
-
+router.post("/login", loginUser);
+router.post("/logout", verifyJWT, logoutUser);
+router.get("/get-user-details", verifyJWT, getUserProfile);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", verifyJWT, resetPassword);
+router.post("/send-otp", sendOTP);
+router.patch("/user-update", verifyJWT, changeUserDetails);
 
 // 📌 **Email Verification**
-router.route("/verify-email").post(verifyEmail);
+router.post("/verify-email", verifyEmail);
 
+// 📌 **Social Login (Google Authentication)**
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
 
-// 📌 **Social Login**
-router.route("/social-login").post(socialLogin);
-
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    successRedirect: "/dashboard",
+    failureRedirect: "/login",
+    session: false, // Redirect frontend if failed
+  }),
+);
 
 export default router;

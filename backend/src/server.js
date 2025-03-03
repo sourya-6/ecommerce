@@ -1,6 +1,9 @@
 import express from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser"
+import session from "express-session";
+import passport from "./config/passport.js";
+import dotenv from "dotenv"
 const app=express()
 //initializing cors
 app.use(cors({
@@ -20,9 +23,24 @@ app.use(express.urlencoded({extended:true,limit:"16kb"}))//used to deal with the
 app.use(express.static("public"))
 app.use(cookieParser())//recent activities
 
+
+//for goole
+// app.use(express.json());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
 import userRouter from "./routes/user.routes.js"
 app.use("/api/v1/user",userRouter)
 
-
+app.get("/api/v1/user/dashboard",(req,res)=>{
+  res.send("hellow world")
+});
 
 export{ app }

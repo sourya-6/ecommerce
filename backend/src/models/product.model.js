@@ -1,14 +1,51 @@
-import mongoose from "mongoose";
+import mongoose,{Schema} from "mongoose";
 
-const productSchema = new mongoose.Schema(
+const productSchema = new Schema(
   {
-    name: { type: String, required: true },
-    description: { type: String, required: true },
-    price: { type: Number, required: true },
-    discountedPrice: { type: Number },
+    name: { 
+        type: String,
+        required: true,
+    
+    },
+    description: { 
+      type: String, 
+      required: true
+    },
+    price: {
+       type: Number, 
+       required: true
+       },
+      brand:{
+        type:String,
+        required:true
+
+    },
+    discountedPrice: { 
+      type: Number 
+    },
     stock: { type: Number, required: true },
-    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
-    image: { type: String },
+    category: { 
+      type: mongoose.Schema.Types.ObjectId,
+       ref: "Category"
+    },
+    images:[ { 
+      type: String
+    }],
+    reviews:[{
+      type:Schema.Types.ObjectId,
+      ref:"Review"
+    }],
+    seller:{
+      type:Schema.Types.ObjectId,
+      ref:"User"
+    },
+    snapXDiscount:{
+      type:Schema.Types.ObjectId,
+      ref:"SnapX"
+    }
+
+
+
   },
   { timestamps: true }
 );

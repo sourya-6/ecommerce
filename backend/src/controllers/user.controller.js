@@ -58,45 +58,90 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 // 📌 **User Login**
+// const loginUser = asyncHandler(async (req, res) => {
+//   const { email, password } = req.body;
+//   if(!email||!password){
+//     throw new ApiError(400,"All fields are mandatory")
+//   }
+
+//   const user = await User.findOne({ email });
+//   if (!user) throw new ApiError(401, "User not exist");
+  
+//   const isPasswordValid = await user.isPasswordCorrect(password);
+  
+//   if (!isPasswordValid) throw new ApiError(401, "Invalid credentials");
+
+//   const accessToken = user.generateAccessToken();
+  
+//   const refreshToken = user.generateRefreshToken();
+
+//   user.refreshToken = refreshToken;
+//   await user.save({validateBeforeSave:false});
+//   const loggedinUser=await User.findById(user._id).select("-password -refreshToken")
+//   if(!loggedinUser){
+//     throw new ApiError(500,"Some thing went wrong while logging in!!")
+//   }
+//   console.log(user._id)
+
+//   const options={
+//     https:true,
+//     secure:true
+//   }
+//   return res.
+//   status(200)
+//   .cookie("accessToken",accessToken,options)
+//   .cookie("refreshToken",refreshToken,options)
+//   .json(new ApiResponse(200,{
+//     user:loggedinUser,accessToken,refreshToken
+//   },"User logged in successfully"))
+
+  
+// })
+
 const loginUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  if(!email||!password){
-    throw new ApiError(400,"All fields are mandatory")
+  const { email, password, googleId } = req.body;
+
+  let user;
+  if (googleId) {
+    // ✅ Google Login
+    user = await User.findOne({ googleId });
+    if (!user) throw new ApiError(401, "User not registered with Google");
+  } else {
+    // ✅ Normal Email/Password Login
+    if (!email || !password) {
+      throw new ApiError(400, "All fields are mandatory");
+    }
+
+    user = await User.findOne({ email });
+    if (!user) throw new ApiError(401, "User does not exist");
+
+    const isPasswordValid = await user.isPasswordCorrect(password);
+    if (!isPasswordValid) throw new ApiError(401, "Invalid credentials");
   }
 
-  const user = await User.findOne({ email });
-  if (!user) throw new ApiError(401, "User not exist");
-  
-  const isPasswordValid = await user.isPasswordCorrect(password);
-  
-  if (!isPasswordValid) throw new ApiError(401, "Invalid credentials");
-
+  // ✅ Generate JWT tokens for both login types
   const accessToken = user.generateAccessToken();
-  
   const refreshToken = user.generateRefreshToken();
 
   user.refreshToken = refreshToken;
-  await user.save({validateBeforeSave:false});
-  const loggedinUser=await User.findById(user._id).select("-password -refreshToken")
-  if(!loggedinUser){
-    throw new ApiError(500,"Some thing went wrong while logging in!!")
-  }
-  console.log(user._id)
+  await user.save({ validateBeforeSave: false });
 
-  const options={
-    https:true,
-    secure:true
+  const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+  if (!loggedInUser) {
+    throw new ApiError(500, "Something went wrong while logging in!!");
   }
-  return res.
-  status(200)
-  .cookie("accessToken",accessToken,options)
-  .cookie("refreshToken",refreshToken,options)
-  .json(new ApiResponse(200,{
-    user:loggedinUser,accessToken,refreshToken
-  },"User logged in successfully"))
 
-  
-})
+  console.log(user._id);
+
+  const options = { httpOnly: true, secure: true };
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(new ApiResponse(200, { user: loggedInUser, accessToken, refreshToken }, "User logged in successfully"));
+});
+
 // 📌 **User Logout**
 const logoutUser = asyncHandler(async (req, res) => {
   // console.log(user._id)

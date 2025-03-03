@@ -5,7 +5,7 @@ function Layout() {
     <>
       <Header />
       <Outlet />
-      <div>Footer</div>  o
+      <div>Footer</div>  
 
     </>
 

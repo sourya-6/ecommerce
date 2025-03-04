@@ -3,22 +3,57 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
+// const userSchema = new mongoose.Schema(
+//   {
+//     name: { type: String, required: function(){ return !this.googleId } },
+//     googleId: { type: String },
+//     username:{type: String, required: true, unique: true},
+//     email: { type: String, required: true },
+//     password: { type: String, required: function(){ return !this.googleId } },
+//     role: { type: String, default: 'customer', enum: ['admin', 'customer', 'seller'] },
+//     isSnapXMember: { type: Boolean, default: false },
+//     snapXExpiry: { type: Date },
+//     avatar: { type: String ,required: true},
+//     phoneNumber: { type: String },
+//     isVerified: { type: Boolean, default: false },
+//     accessToken: { type: String },
+//     refreshToken: { type: String },
+//     resetOTP:{type: String,default:undefined},
+//     resetOTPExpires:{type: Date,default:undefined},
+//   },
+//   { timestamps: true }
+// );
 const userSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    username:{type: String, required: true, unique: true},
+    name: {
+      type: String,
+      required: function () {
+        return !this.googleId;
+      },
+    },
+    googleId: { type: String },
+    username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    role: { type: String, default: 'customer', enum: ['admin', 'customer', 'seller'] },
+    password: {
+      type: String,
+      required: function () {
+        return !this.googleId;
+      },
+    },
+    role: {
+      type: String,
+      enum: ["admin", "customer", "seller"],
+      default: "customer",
+    },
     isSnapXMember: { type: Boolean, default: false },
     snapXExpiry: { type: Date },
-    avatar: { type: String ,required: true},
+    avatar: { type: String, required: true },
     phoneNumber: { type: String },
     isVerified: { type: Boolean, default: false },
     accessToken: { type: String },
     refreshToken: { type: String },
-    resetOTP:{type: String,default:undefined},
-    resetOTPExpires:{type: Date,default:undefined},
+    resetOTP: { type: String, default: undefined },
+    resetOTPExpires: { type: Date, default: undefined },
   },
   { timestamps: true }
 );

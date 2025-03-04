@@ -98,10 +98,60 @@ const registerUser = asyncHandler(async (req, res) => {
   
 // })
 
+// const loginUser = asyncHandler(async (req, res) => {
+//   const { email, password, googleId } = req.body;
+//   console.log(req.body)
+//   console.log('hey')
+
+//   console.log(googleId)
+
+//   let user;
+//   if (googleId) {
+//     // ✅ Google Login
+//     user = await User.findOne({ googleId });
+//     if (!user) throw new ApiError(401, "User not registered with Google");
+//   } else {
+//     // ✅ Normal Email/Password Login
+//     console.log('hey')
+//     if (!email || !password) {
+//       throw new ApiError(400, "All fields are mandatory");
+//     }
+
+//     user = await User.findOne({ email });
+//     if (!user) throw new ApiError(401, "User does not exist");
+
+//     const isPasswordValid = await user.isPasswordCorrect(password);
+//     if (!isPasswordValid) throw new ApiError(401, "Invalid credentials");
+//   }
+
+//   // ✅ Generate JWT tokens for both login types
+//   const accessToken = user.generateAccessToken();
+//   const refreshToken = user.generateRefreshToken();
+
+//   user.refreshToken = refreshToken;
+//   await user.save({ validateBeforeSave: false });
+
+//   const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+//   if (!loggedInUser) {
+//     throw new ApiError(500, "Something went wrong while logging in!!");
+//   }
+
+//   console.log(user._id);
+
+//   const options = { httpOnly: true, secure: true };
+
+//   return res
+//     .status(200)
+//     .cookie("accessToken", accessToken, options)
+//     .cookie("refreshToken", refreshToken, options)
+//     .json(new ApiResponse(200, { user: loggedInUser, accessToken, refreshToken }, "User logged in successfully"));
+// });
+
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password, googleId } = req.body;
 
   let user;
+
   if (googleId) {
     // ✅ Google Login
     user = await User.findOne({ googleId });
@@ -109,36 +159,41 @@ const loginUser = asyncHandler(async (req, res) => {
   } else {
     // ✅ Normal Email/Password Login
     if (!email || !password) {
-      throw new ApiError(400, "All fields are mandatory");
+      throw new ApiError(400, "Email and password are required");
     }
 
-    user = await User.findOne({ email });
-    if (!user) throw new ApiError(401, "User does not exist");
+    user = await User.findOne({ email }).select("+password");
+    if (!user) throw new ApiError(401, "Invalid email or password");
 
     const isPasswordValid = await user.isPasswordCorrect(password);
-    if (!isPasswordValid) throw new ApiError(401, "Invalid credentials");
+    if (!isPasswordValid) throw new ApiError(401, "Invalid email or password");
   }
 
-  // ✅ Generate JWT tokens for both login types
+  // ✅ Generate JWT tokens
   const accessToken = user.generateAccessToken();
   const refreshToken = user.generateRefreshToken();
 
+  // ✅ Store refresh token securely in DB
   user.refreshToken = refreshToken;
   await user.save({ validateBeforeSave: false });
 
+  // ✅ Fetch user details without sensitive fields
   const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
-  if (!loggedInUser) {
-    throw new ApiError(500, "Something went wrong while logging in!!");
-  }
+  if (!loggedInUser) throw new ApiError(500, "Login failed. Please try again.");
 
-  console.log(user._id);
+  console.log(`User logged in: ${user._id}`);
 
-  const options = { httpOnly: true, secure: true };
+  // ✅ Secure Cookie Options
+  const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+    sameSite: "Strict",
+  };
 
   return res
     .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, cookieOptions)
+    .cookie("refreshToken", refreshToken, cookieOptions)
     .json(new ApiResponse(200, { user: loggedInUser, accessToken, refreshToken }, "User logged in successfully"));
 });
 

@@ -10,7 +10,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:4000/api/v1/user/google",
+      callbackURL: "http://localhost:4000/api/v1/user/google/callback", // FIXED ✅
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -19,10 +19,11 @@ passport.use(
         if (!user) {
           user = new User({
             googleId: profile.id,
-            name: profile.displayName,
+            username: profile.displayName,
             email: profile.emails[0].value,
             avatar: profile.photos[0].value,
             role: "customer", // Default role
+            status: "active",
           });
 
           await user.save();

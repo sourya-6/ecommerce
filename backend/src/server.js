@@ -28,13 +28,14 @@ app.use(cookieParser())//recent activities
 // app.use(express.json());
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || "your-secret-key",
     resave: false,
     saveUninitialized: false,
   })
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 import userRouter from "./routes/user.routes.js"
 app.use("/api/v1/user",userRouter)

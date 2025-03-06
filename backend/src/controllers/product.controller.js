@@ -18,6 +18,7 @@ const createProduct=asyncHandler(async(req,res) =>{
     })
     
 })
+export  default createProduct
 
 
 

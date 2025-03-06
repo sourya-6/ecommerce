@@ -48,6 +48,7 @@ router.get(
       process.env.ACCESS_TOKEN_SECRET, // ✅ Correct secret key
       { expiresIn: "7d" }
     );
+    res.send("<a href='https://www.google.com'>Click here to go to dashboard</a>");
 
     res.cookie("accessToken", token, { httpOnly: true, secure: true });
     res.status(200).json({ success: true, token, message: "Login successful" });

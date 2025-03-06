@@ -12,11 +12,15 @@ import { ResetOTPgenerated } from "../utils/reset_otp.js";
 
 // 📌 **User Registration**
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, phoneNumber,username } = req.body;
-  console.log(name)
+  const { name, email, password, phoneNumber,username ,role} = req.body;
+
   if([name||email||password||phoneNumber].some((field)=>field?.trim() === "")){
-    throw new ApiError(400,"All fields are mandatory")
+    throw new ApiError(400,"All fields are mandatory") 
   }
+
+  //checks like if the role is admin it will take it or pass to role and if it is seller it goes to sell else it will become customer
+  const userRole = role && role ==="admin" ?"admin" :role ==="seller" ?"seller":"customer";
+
   const emailValidation=validateEmail(email);
   if(!emailValidation){
     throw new ApiError(400,"Invalid email")
@@ -42,6 +46,7 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     phoneNumber,
+    role:userRole,
     avatar:avatar.url,
     username:username.toLowerCase()
   });

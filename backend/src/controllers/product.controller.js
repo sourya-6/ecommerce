@@ -36,13 +36,7 @@ const createProduct=asyncHandler(async(req,res) =>{
          new ApiResponse(200,product,"Product created successfully")
     )
 })
-export  default createProduct
-
-
-
-
-
 
 export {
-
+    createProduct
 };

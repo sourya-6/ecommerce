@@ -35,10 +35,10 @@ const productSchema = new Schema(
       type:Schema.Types.ObjectId,
       ref:"Review"
     }],
-    seller:{
+    owner:[{
       type:Schema.Types.ObjectId,
       ref:"User"
-    },
+    }],
     snapXDiscount:{
       type:Schema.Types.ObjectId,
       ref:"SnapX"
@@ -58,5 +58,5 @@ productSchema.pre("save", function (next) {
   next();
 });
 
-const Product = mongoose.model("Product", productSchema);
-export default Product;
+export const Product = mongoose.model("Product", productSchema);
+

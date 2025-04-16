@@ -39,10 +39,11 @@ app.use(passport.session());
 
 import userRouter from "./routes/user.routes.js"
 import productRouter from "./routes/product.routes.js"
+import categoryRouter from "./routes/category.routes.js"
 app.use("/api/v1/user",userRouter)
 
 app.use("/api/v1/product",productRouter)
-
+app.use("/api/v1/category",categoryRouter)
 app.get("/api/v1/user/dashboard",(req,res)=>{
   res.send("hellow world")
 });

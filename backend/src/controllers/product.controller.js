@@ -65,7 +65,9 @@ const multipleProductUpload = asyncHandler(async (req, res) => {
   if (customer_role === "customer") {
     throw new ApiError(403, "You are not authorized to create a product");
   }
-
+  console.log(req.files, "Files");
+  console.log(req.files.images, "Images");
+  console.log(req.files.excel, "Excel");
   if (!req.files || !req.files.images || !req.files.excel) {
     throw new ApiError(400, "Missing required files. Upload images and an Excel file.");
   }

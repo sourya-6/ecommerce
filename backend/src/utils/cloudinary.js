@@ -1,15 +1,13 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
-import path from "path"; // Import path module
+import mime from "mime-types";
+import path from "path";
 
-// Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
-
 
 const uploadOnCloudinary = async (localFilePath) => {
   try {
@@ -18,38 +16,26 @@ const uploadOnCloudinary = async (localFilePath) => {
       return null;
     }
 
-   
-
-    const ext = path.extname(localFilePath).toLowerCase();
-    const isImage = [".jpg", ".jpeg", ".png", ".gif", ".webp"].includes(ext);
-    const resourceType = isImage ? "image" : "raw";
-
-   
+    const mimeType = mime.lookup(localFilePath);
+    const resourceType = mimeType && mimeType.startsWith("image") ? "image" : "raw";
 
     const response = await cloudinary.uploader.upload(localFilePath, {
       resource_type: resourceType,
+      folder: "snapbuy", // optional
     });
 
-    
-
-    // ✅ Delete file asynchronously
     if (fs.existsSync(localFilePath)) {
-      fs.promises.unlink(localFilePath)
-        .then(() => console.log("🗑️ File deleted successfully:", localFilePath))
-        .catch((err) => console.error("❌ Error deleting file:", err));
-    } else {
-      console.log("⚠️ File already deleted or not found:", localFilePath);
+      await fs.promises.unlink(localFilePath);
+      console.log("🗑️ File deleted successfully:", localFilePath);
     }
 
     return response;
   } catch (error) {
     console.error("❌ Upload failed:", error);
 
-    // Ensure file is deleted even if upload fails
     if (fs.existsSync(localFilePath)) {
-      fs.promises.unlink(localFilePath)
-        .then(() => console.log("🗑️ Failed upload file deleted:", localFilePath))
-        .catch((err) => console.error("❌ Error deleting file after failed upload:", err));
+      await fs.promises.unlink(localFilePath);
+      console.log("🗑️ Deleted file after failed upload:", localFilePath);
     }
 
     return null;

@@ -1,26 +1,42 @@
 import { Link } from "react-router-dom";
 import SearchBar from "./SearchBar";
 import ProfileMenu from "./Profile";
+import { ShoppingCart, PackageCheck } from "lucide-react";
+import CartIcon from "./Cart";
+
 
 function Header() {
   return (
-    <nav className="bg-white shadow-md flex items-center px-6 justify-between border-b border-gray-200" style={{ height: "7vh" }}>
-      {/* Logo Section */}
-      <div className="w-[10%] text-2xl font-bold text-blue-600 hover:text-blue-700 transition-all">
-        <Link to="/">SnapBuy</Link>
-      </div>
+    <nav className="bg-white shadow-md px-6 py-3 border-b border-gray-200">
+      <div className="max-w-screen-xl mx-auto flex items-center justify-between space-x-6">
+        {/* Left: Logo */}
+        <div className="flex-shrink-0">
+          <Link
+            to="/"
+            className="text-3xl font-extrabold text-blue-600 hover:text-blue-700 tracking-wide"
+          >
+            {/* SnapBuy */}
+            <img src="/logo.svg" alt="SnapBuy Logo" className="h-15 w-auto object-contain"/>
+          </Link>
+        </div>
 
-      {/* Search Bar Section */}
-      <div className="w-[30%] md:w-[50%]">
-        <SearchBar />
-      </div>
+        {/* Center: Search */}
+        <div className="flex-grow mx-6">
+          <SearchBar />
+        </div>
 
-      {/* Profile & Orders Section */}
-      <div className="w-[20%] flex items-center justify-end space-x-6">
-        <Link to="/orders" className="text-gray-700 font-semibold hover:text-blue-600 transition-all">
-          Orders
-        </Link>
-        <ProfileMenu />
+        {/* Right: Cart, Orders, Profile */}
+        <div className="flex items-center space-x-6">
+          <CartIcon />
+          <Link
+            to="/orders"
+            className="text-gray-700 hover:text-blue-600 font-medium flex items-center space-x-1"
+          >
+            <PackageCheck size={20} />
+            <span>Orders</span>
+          </Link>
+          <ProfileMenu />
+        </div>
       </div>
     </nav>
   );

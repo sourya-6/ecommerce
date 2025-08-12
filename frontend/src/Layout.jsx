@@ -1,6 +1,7 @@
 import Header from './pages/Header'
 import { Outlet } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import Footer from './pages/Footer/Footer';
 
 function Layout() {
   const { loadingAuth } = useSelector((state) => state.user);
@@ -17,7 +18,7 @@ function Layout() {
     <>
       <Header />
       <Outlet />
-      <div>Footer</div>  
+      <Footer />
     </>
   )
 }

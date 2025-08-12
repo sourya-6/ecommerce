@@ -21,24 +21,21 @@ const cartSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    totalSaved: {
-      type: Number,
-      default: function () {
-        return this.totalActualPrice - this.totalDiscountedPrice;
-      },
-    },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-// Pre-save hook to calculate totals from cart items
+// ✅ Virtual for total saved
+cartSchema.virtual("totalSaved").get(function () {
+  return this.totalActualPrice - this.totalDiscountedPrice;
+});
+
+// ✅ Pre-save hook to recalculate totals
 cartSchema.pre("save", async function (next) {
   if (!this.cartItems || this.cartItems.length === 0) return next();
 
   const cartItems = await mongoose.model("CartItem").find({
-    _id: {
-      $in: this.cartItems,
-    },
+    _id: { $in: this.cartItems },
   });
 
   this.totalActualPrice = cartItems.reduce(
@@ -47,11 +44,9 @@ cartSchema.pre("save", async function (next) {
   );
 
   this.totalDiscountedPrice = cartItems.reduce(
-    (sum, item) => sum + item.discountedPrice * item.quantity,
+    (sum, item) => sum + item.subtotal,
     0
   );
-
-  this.totalSaved = this.totalActualPrice - this.totalDiscountedPrice;
 
   next();
 });

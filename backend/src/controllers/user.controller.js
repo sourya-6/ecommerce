@@ -277,7 +277,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
   }
   res
     .status(200)
-    .json(new ApiResponse(user, "User profile fetched successfully"));
+    .json(new ApiResponse(200, user, "User profile fetched successfully"));
 });
 
 const changeUserDetails = asyncHandler(async (req, res) => {

@@ -12,6 +12,12 @@ const cartItemSchema = new mongoose.Schema(
       ref: "Product",
       required: true,
     },
+    cart: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Cart",
+  required: true,
+},
+
     quantity: {
       type: Number,
       required: true,
@@ -22,6 +28,10 @@ const cartItemSchema = new mongoose.Schema(
       required: true,
     },
     discountedPrice: {
+      type: Number,
+      required: true,
+    },
+     subtotal: {
       type: Number,
       required: true,
     },

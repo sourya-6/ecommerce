@@ -4,7 +4,7 @@ SnapBuy is a **production-ready MERN stack e-commerce application** with **role-
 
 ---
 
-## 📌 Features Implemented
+##  Features Implemented
 
 ### 1. Authentication & User Management
 - JWT authentication using **HTTP-only cookies** (access & refresh tokens)
@@ -118,8 +118,60 @@ frontend/
 ## ⚙️ Setup & Installation
 
 ### 1. Clone the Repository
-<pre>
+
 ```bash
 git clone https://github.com/sourya-6/ecommerce.git
+```
+```bash
 cd snapbuy
-</pre>
+```
+
+
+### 2.Backend Setup
+
+```bash
+cd backend
+npm install
+```
+Create .env file in backend folder:
+```plaintext
+PORT=5000
+MONGODB_URI=mongodb://127.0.0.1:27017/snapbuy
+JWT_SECRET=your_jwt_secret
+ACCESS_TOKEN_EXPIRY=15m
+REFRESH_TOKEN_EXPIRY=7d
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+SMTP_HOST=smtp.yourservice.com
+SMTP_PORT=587
+SMTP_USER=your_email
+SMTP_PASS=your_email_password
+RAZORPAY_KEY_ID=your_key_id
+RAZORPAY_KEY_SECRET=your_key_secret
+RAZORPAY_WEBHOOK_SECRET=your_webhook_secret
+FRONTEND_URL=http://localhost:5173
+```
+
+### 3. Frontend Setup
+```bash
+cd frontend
+npm install
+```
+Create .env file in frontend folder:
+```bash
+VITE_API_URL=http://localhost:5000/api/v1
+VITE_RAZORPAY_KEY_ID=your_key_id
+```
+
+### 4.Running the App
+Start Backend:
+```bash
+cd backend
+npm run dev
+```
+Start Frontend:
+```bash
+cd frontend
+npm run dev
+```
